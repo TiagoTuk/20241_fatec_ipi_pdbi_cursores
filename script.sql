@@ -1,33 +1,70 @@
---cursor vinculado(bound)
---exibir nomes dos canais concatenado a seu numero de inscritos
+-- cursor com parâmetro nomeado e por ordem
+-- exibir nomes dos youtubers que começaram a partir de 2010
+-- e que têm, pelo menos, 60m inscritos
 -- mais um bloquinho anônimo
 DO $$
 	DECLARE
-		--cursor bound(vinculado)
-		--1. Declaração (cursor ainda não está aberto)
-		cur_nomes_e_inscritos CURSOR FOR
-		SELECT youtuber, subscribers FROM tb_youtubers;
-		tupla RECORD;
-		--tupla.youtuber devolve o youtuber
-		--tupla.subscribes devolve o número de subscribers
-		resultado TEXT DEFAULT '';
+		v_ano INT := 2010;
+		v_inscritos INT := 60000000;
+		--1. Declaração do cursor
+		cur_ano_inscritos CURSOR (ano INT, inscritos INT) FOR 
+		SELECT youtuber FROM tb_youtubers WHERE started >= ano AND subscribers >= inscritos;
+		v_youtuber VARCHAR(200);
 	BEGIN
 		--2. Abertura do cursor
-		OPEN cur_nomes_e_inscritos;
-		-- vamos usar um loop WHILE
-		--3. Recuperação de dados
-		FETCH cur_nomes_e_inscritos INTO tupla;
-		WHILE FOUND LOOP
-			--concatenação, operador ||
-			resultado := resultado || tupla.youtuber || ':' || tupla.subscribers || ',';
-			FETCH cur_nomes_e_inscritos INTO tupla;
+		-- essa, passando argumentos pela ordem
+		-- OPEN cur_ano_inscritos(v_ano, V_inscritos);
+		--ou, passando argumentos pelo nome
+		-- OPEN cur_ano_inscritos(inscritos := v_inscritos, ano := v_ano);
+		OPEN cur_ano_inscritos(ano := v_ano, inscritos := v_inscritos);
+		LOOP
+		-- buscar o nome
+		--3. Recuperação dos dados
+		FETCH cur_ano_inscritos INTO v_youtuber;
+		-- sair, se for o caso
+		EXIT WHEN NOT FOUND;
+		--exibir, se puder
+		RAISE NOTICE '%', v_youtuber;
 		END LOOP;
-		--4. Fechamento do cursor
-		CLOSE cur_nomes_e_inscritos;
-		RAISE NOTICE '%', resultado;
+		--4. Fechamento
+		CLOSE cur_ano_inscritos;
 	END;
 $$
-SELECT * FROM tb_youtubers;
+
+
+
+
+
+-- --cursor vinculado(bound)
+-- --exibir nomes dos canais concatenado a seu numero de inscritos
+-- -- mais um bloquinho anônimo
+-- DO $$
+-- 	DECLARE
+-- 		--cursor bound(vinculado)
+-- 		--1. Declaração (cursor ainda não está aberto)
+-- 		cur_nomes_e_inscritos CURSOR FOR
+-- 		SELECT youtuber, subscribers FROM tb_youtubers;
+-- 		tupla RECORD;
+-- 		--tupla.youtuber devolve o youtuber
+-- 		--tupla.subscribes devolve o número de subscribers
+-- 		resultado TEXT DEFAULT '';
+-- 	BEGIN
+-- 		--2. Abertura do cursor
+-- 		OPEN cur_nomes_e_inscritos;
+-- 		-- vamos usar um loop WHILE
+-- 		--3. Recuperação de dados
+-- 		FETCH cur_nomes_e_inscritos INTO tupla;
+-- 		WHILE FOUND LOOP
+-- 			--concatenação, operador ||
+-- 			resultado := resultado || tupla.youtuber || ':' || tupla.subscribers || ',';
+-- 			FETCH cur_nomes_e_inscritos INTO tupla;
+-- 		END LOOP;
+-- 		--4. Fechamento do cursor
+-- 		CLOSE cur_nomes_e_inscritos;
+-- 		RAISE NOTICE '%', resultado;
+-- 	END;
+-- $$
+-- SELECT * FROM tb_youtubers;
 
 -- -- cursor não vinculado (unbound)
 -- -- cursor com query dinâmica, ou seja, uma query representada
