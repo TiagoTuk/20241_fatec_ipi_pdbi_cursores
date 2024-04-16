@@ -49,3 +49,14 @@ BEGIN
 	CLOSE cur_yout;
 END;
 $$
+
+'''
+1.3 Faça uma pesquisa sobre o anti-pattern chamado RBAR - Row By Agonizing Row.
+Explique com suas palavras do que se trata
+
+R: 	RBAR (Linha por linha agonizante, em português) são uma série de cláusulas e funções que, se usadas
+de forma indevida em uma query/solução, acarretam problemas quanto a performance de um SGBD. 
+Isso occorre pois essas funções e cláusulas processão valores linha em linha para condicionar
+suas necessidades. Essas funções RBAR podem ser categorizadas como tipos não padrões de estruturas
+e soluções, conhecidas como anti-pattern, geralmente ineficientes que possuem objetivos singulares
+(como a função AVG(), cláusula LOOP e etc).
